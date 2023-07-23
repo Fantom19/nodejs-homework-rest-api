@@ -1,83 +1,28 @@
 import express from "express";
-import Joi from "joi";
-import * as contacts from "../../models/contacts.js";
-import HttpError from "../../helpers/HttpError.js";
+import contactsController from "../../controllers/contacts.js";
 
-const addSchema = Joi.object({
-  name: Joi.string().required(),
-  email: Joi.string().required(),
-  phone: Joi.string().required(),
-});
+import { validateBody } from "../../middlewares/index.js";
+import contactAddSchema from "../../schemas/contacts.js";
 
 const router = express.Router();
 
-router.get("/", async (req, res, next) => {
-  try {
-    const result = await contacts.listContacts();
-    res.json(result);
-  } catch (e) {
-    res.status(500).json({
-      message: e.message,
-    });
-  }
-});
-
-router.get("/:contactId", async (req, res, next) => {
-  try {
-    const { contactId } = req.params;
-    const result = await contacts.getContactById(contactId);
-    if (!result) {
-      throw HttpError(404);
-    }
-    res.json(result);
-  } catch (e) {
-    next(e);
-  }
-});
-
-router.post("/", async (req, res, next) => {
-  try {
-    const { error } = addSchema.validate(req.body);
-    if (error) {
-      throw HttpError(400, error.message);
-    }
-    const result = await contacts.addContact(req.body);
-    res.status(201).json(result);
-  } catch (error) {
-    next(error);
-  }
-});
-
-router.delete("/:contactId", async (req, res, next) => {
-  try {
-    const { contactId } = req.params;
-    const result = await contacts.removeContact(contactId);
-    if (!result) {
-      throw HttpError(404);
-    }
-    res.json({
-      message: "Contact delete",
-    });
-  } catch (error) {
-    next(error);
-  }
-});
-
-router.put("/:contactId", async (req, res, next) => {
-  try {
-    const { error } = addSchema.validate(req.body);
-    if (error) {
-      throw HttpError(400, error.message);
-    }
-    const { contactId } = req.params;
-    const result = await contacts.updateContact(contactId, req.body);
-    if (!result) {
-      throw HttpError(404);
-    }
-    res.json(result);
-  } catch (error) {
-    next(error);
-  }
-});
+router.get("/", contactsController.listContacts);
+router.get("/:id", contactsController.getContactById);
+router.post(
+  "/",
+  validateBody(contactAddSchema.contactAddSchema),
+  contactsController.addContact
+);
+router.put(
+  "/:id",
+  validateBody(contactAddSchema.contactAddSchema),
+  contactsController.updateContactById
+);
+router.patch(
+  "/:id/favorite",
+  validateBody(contactAddSchema.contactUpdateFavoriteSchema),
+  contactsController.updateStatusContact
+);
+router.delete("/:id", contactsController.deleteContactById);
 
 export default router;
