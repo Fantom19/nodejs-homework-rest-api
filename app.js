@@ -1,9 +1,10 @@
 import express from "express";
 import logger from "morgan";
 import cors from "cors";
-
 import dotenv from "dotenv";
+
 import contactsRouter from "./routes/api/contacts.js";
+import authRouter from "./routes/api/users.js";
 
 dotenv.config();
 
@@ -16,14 +17,15 @@ app.use(cors());
 app.use(express.json());
 
 app.use("/api/contacts", contactsRouter);
+app.use("/api/users", authRouter);
 
-app.use((_, res) => {
-  res.status(404).json({ message: "Not found" });
+app.use((req, res) => {
+  res.status(404).json({ status: "error", code: 404, message: "Not found" });
 });
 
-app.use((err, _, res, __) => {
+app.use((err, req, res, next) => {
   const { status = 500, message = "Server error" } = err;
-  res.status(status).json({ message });
+  res.status(status).json({ status: "error", code: status, message });
 });
 
 export default app;
