@@ -1,28 +1,34 @@
 import express from "express";
 const router = express.Router();
 
-import {
-  controllerWrapper,
-  validation,
+import * as ctrl from "../../controllers/users/index.js";
+import { validateBody, authenticate, upload } from "../../middlewares/index.js";
+import { wrapper } from "../../helpers/index.js";
+import { schemasUsers } from "../../models/index.js";
+
+router.post(
+  "/register",
+  validateBody(schemasUsers.joiRegisterSchema),
+  wrapper(ctrl.register)
+);
+
+router.post(
+  "/login",
+  validateBody(schemasUsers.joiLoginSchema),
+  wrapper(ctrl.login)
+);
+
+router.get("/current", authenticate, wrapper(ctrl.current));
+
+router.post("/logout", authenticate, wrapper(ctrl.logout));
+
+router.patch("/update", authenticate, wrapper(ctrl.updateSubscription));
+
+router.patch(
+  "/avatars",
   authenticate,
-} from "../../middlewares/index.js";
-
-import { joiUserSchema } from "../../models/user.js";
-import * as ctrl from "../../controllers/auth/index.js";
-
-router.post(
-  "/signup",
-  validation(joiUserSchema),
-  controllerWrapper(ctrl.signUp)
+  upload.single("avatar"),
+  wrapper(ctrl.updateAvatar)
 );
-
-router.post(
-  "/signin",
-  validation(joiUserSchema),
-  controllerWrapper(ctrl.signIn)
-);
-
-router.get("/signout", authenticate, controllerWrapper(ctrl.signOut));
-router.get("/current", authenticate, controllerWrapper(ctrl.currentUser));
 
 export default router;

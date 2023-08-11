@@ -1,5 +1,5 @@
+import validateBody from "./validateBody.js";
 import authenticate from "./authenticate.js";
-import controllerWrapper from "./controllerWrapper.js";
-import validation from "./validation.js";
+import upload from "./upload.js";
 
-export { authenticate, controllerWrapper, validation };
+export { validateBody, authenticate, upload };

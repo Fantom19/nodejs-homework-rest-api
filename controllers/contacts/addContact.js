@@ -1,14 +1,19 @@
-import { Contact } from "../../models/index.js";
+import { HttpError } from "../../helpers/index.js";
+import { Contact, schemasContact } from "../../models/contact.js";
 
-const addContact = async (req, res) => {
-  const result = await Contact.create({ ...req.body, owner: req.user._id });
+const postAddContact = async (req, res, next) => {
+  try {
+    const { error } = schemasContact.addSchema.validate(req.body);
+    if (error) {
+      throw new HttpError(400, "missing required name field");
+    }
+    const { _id: owner } = req.user;
+    const result = await Contact.create({ ...req.body, owner });
 
-  res.json({
-    status: "success",
-    code: 201,
-    data: { result },
-    message: "Contact added",
-  });
+    res.status(201).json(result);
+  } catch (error) {
+    next(error);
+  }
 };
 
-export default addContact;
+export default postAddContact;

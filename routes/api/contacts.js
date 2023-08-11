@@ -1,48 +1,25 @@
 import express from "express";
+import * as ctrl from "../../controllers/contacts/index.js";
+import { validateBody, authenticate } from "../../middlewares/index.js";
+import { schemasContact } from "../../models/index.js";
+
 const router = express.Router();
 
-import {
-  authenticate,
-  controllerWrapper,
-  validation,
-} from "../../middlewares/index.js";
+router.get("/", authenticate, ctrl.getListContacts);
 
-import {
-  joiContactSchema,
-  updateContactStatusSchema,
-} from "../../models/contacts.js";
+router.get("/:contactId", authenticate, ctrl.getContacts);
 
-import * as ctrl from "../../controllers/contacts/index.js";
+router.post("/", authenticate, ctrl.postAddContact);
 
-router.get("/", controllerWrapper(ctrl.listContacts));
+router.delete("/:contactId", authenticate, ctrl.deleteContact);
 
-router.get("/:contactId", controllerWrapper(ctrl.getContactById));
-
-router.post(
-  "/",
-  authenticate,
-  validation(joiContactSchema),
-  controllerWrapper(ctrl.addContact)
-);
-
-router.delete(
-  "/:contactId",
-  authenticate,
-  controllerWrapper(ctrl.removeContact)
-);
-
-router.put(
-  "/:contactId",
-  authenticate,
-  validation(joiContactSchema),
-  controllerWrapper(ctrl.updateContact)
-);
+router.put("/:contactId", authenticate, ctrl.putUpdateContact);
 
 router.patch(
   "/:contactId/favorite",
   authenticate,
-  validation(updateContactStatusSchema),
-  controllerWrapper(ctrl.updateContactStatus)
+  validateBody(schemasContact.updateFavoriteSchema),
+  ctrl.patchUpdateStatusContact
 );
 
 export default router;

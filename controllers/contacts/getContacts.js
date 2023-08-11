@@ -1,16 +1,10 @@
 import { HttpError } from "../../helpers/index.js";
 import { Contact } from "../../models/contact.js";
 
-const patchUpdateStatusContact = async (req, res, next) => {
+const getContacts = async (req, res, next) => {
   try {
-    const { favorite } = req.body;
     const { contactId } = req.params;
-
-    const result = await Contact.findByIdAndUpdate(
-      contactId,
-      { favorite },
-      { new: true }
-    );
+    const result = await Contact.findById(contactId);
     if (!result) {
       throw new HttpError(404, "Not found");
     }
@@ -21,4 +15,4 @@ const patchUpdateStatusContact = async (req, res, next) => {
   }
 };
 
-export default patchUpdateStatusContact;
+export default getContacts;

@@ -1,15 +1,15 @@
-import listContacts from "./listContacts.js";
-import getContactById from "./getContactById.js";
-import addContact from "./addContact.js";
-import removeContact from "./removeContact.js";
-import updateContact from "./updateContact.js";
-import updateContactStatus from "./updateContactStatus.js";
+import postAddContact from "./addContact.js";
+import deleteContact from "./deleteContact.js";
+import getListContacts from "./ListContacts.js";
+import getContacts from "./getContacts.js";
+import putUpdateContact from "./updateContact.js";
+import patchUpdateStatusContact from "./updateContactStatus.js";
 
 export {
-  listContacts,
-  getContactById,
-  addContact,
-  removeContact,
-  updateContact,
-  updateContactStatus,
+  postAddContact,
+  deleteContact,
+  getListContacts,
+  getContacts,
+  putUpdateContact,
+  patchUpdateStatusContact,
 };

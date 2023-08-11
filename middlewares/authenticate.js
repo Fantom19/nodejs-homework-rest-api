@@ -1,53 +1,29 @@
-import { User } from "../models/index.js";
+import { HttpError } from "../helpers/index.js";
 import jwt from "jsonwebtoken";
+// import { SECRET_KEY } from "";
+import { User } from "../models/users.js";
 
-import dotenv from "dotenv";
-dotenv.config();
 const { SECRET_KEY } = process.env;
 
 const authenticate = async (req, res, next) => {
-  const { authorization } = req.headers;
-
+  const { authorization = "" } = req.headers;
   if (!authorization) {
-    res.status(401).json({
-      status: "error",
-      code: 401,
-      message: "Not authorized",
-    });
-    return;
+    next(HttpError(401, "Not authorized 1"));
   }
-
   const [bearer, token] = authorization.split(" ");
-
   if (bearer !== "Bearer") {
-    res.status(401).json({
-      status: "error",
-      code: 401,
-      message: "Not authorized",
-    });
-    return;
+    next(HttpError(401, "Not authorized 2"));
   }
-
   try {
-    const { _id } = jwt.verify(token, SECRET_KEY);
-    const user = await User.findById(_id);
-
-    if (!user.token) {
-      res.status(401).json({
-        status: "error",
-        code: 401,
-        message: "Not authorized",
-      });
-      return;
+    const { id } = jwt.verify(token, SECRET_KEY);
+    const user = await User.findById(id);
+    if (!user) {
+      next(HttpError(401, "Not authorized 3"));
     }
     req.user = user;
     next();
-  } catch (error) {
-    res.status(401).json({
-      status: "error",
-      code: 401,
-      message: "Not authorized",
-    });
+  } catch {
+    next(HttpError(401, "Not authorized 4"));
   }
 };
 

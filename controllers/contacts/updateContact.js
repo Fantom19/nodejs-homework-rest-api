@@ -1,24 +1,22 @@
-// import { NotFound } from "http-errors";
-import createError from "http-errors";
-import { Contact } from "../../models/index.js";
+import { HttpError } from "../../helpers/index.js";
+import { Contact, schemasContact } from "../../models/contact.js";
 
-const updateContact = async (req, res) => {
-  const { contactId } = req.params;
-  const result = await Contact.findByIdAndUpdate(contactId, req.body, {
-    new: true,
-  });
+const putUpdateContact = async (req, res, next) => {
+  try {
+    const { error } = schemasContact.addSchema.validate(req.body);
+    if (error) {
+      throw new HttpError(400, "missing fields");
+    }
+    const { contactId } = req.params;
+    const result = await Contact.findByIdAndUpdate(contactId, req.body);
+    if (!result) {
+      throw new HttpError(404, "Not found");
+    }
 
-  if (!result) {
-    // throw new NotFound(`Contact with id ${contactId} not found`);
-    throw createError.NotFound(`Contact with id ${contactId} not found`);
+    res.json(result);
+  } catch (error) {
+    next(error);
   }
-
-  res.json({
-    status: "success",
-    code: 200,
-    data: { result },
-    message: "Contact updated",
-  });
 };
 
-export default updateContact;
+export default putUpdateContact;

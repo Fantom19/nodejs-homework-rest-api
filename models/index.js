@@ -1,4 +1,4 @@
-import { Contact } from "./contacts.js";
-import { User } from "./user.js";
+import { Contact, schemasContact } from "./contact.js";
+import { User, schemasUsers } from "./users.js";
 
-export { Contact, User };
+export { Contact, schemasContact, User, schemasUsers };

@@ -1,13 +1,24 @@
-import { Contact } from "../../models/index.js";
+import { Contact } from "../../models/contact.js";
 
-const listContacts = async (req, res) => {
-  const results = await Contact.find({});
+const getListContacts = async (req, res, next) => {
+  try {
+    const { _id: owner } = req.user;
+    const { page = 1, limit = 20, favorite = true } = req.query;
+    const skip = (page - 1) * limit;
 
-  res.json({
-    status: "success",
-    code: 200,
-    data: { results },
-  });
+    const result = await Contact.find(
+      { owner, favorite: favorite },
+      "-createdAt -updatedAt",
+      {
+        skip,
+        limit,
+      }
+    );
+
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({ message: "Server error" });
+  }
 };
 
-export default listContacts;
+export default getListContacts;
