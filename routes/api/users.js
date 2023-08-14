@@ -12,6 +12,10 @@ router.post(
   wrapper(ctrl.register)
 );
 
+router.get("/verify/:verificationToken", wrapper(ctrl.verifyEmail));
+
+router.post("/verify", wrapper(ctrl.resendVerifyEmail));
+
 router.post(
   "/login",
   validateBody(schemasUsers.joiLoginSchema),
